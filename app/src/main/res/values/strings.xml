@@ -4,4 +4,6 @@
     <string name="whatsapp_web_url">https://app.myeco.id</string>
     <string name="whatsapp_host">.myeco.id</string>
     <string name="user_agent_string">Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/72.0</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
