@@ -4,19 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
     app:startDestination="@id/mainFragment">
-
     <fragment
         android:id="@+id/mainFragment"
-        android:name="id.myeco.myeco.presentation.ui.fragment.MainFragment"
+        android:name="id.myeco.myeco.presentation.ui.fragment.main.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
-        <action
-            android:id="@+id/action_mainFragment_to_inputDataFragment"
-            app:destination="@id/inputDataFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/inputDataFragment"
-        android:name="id.myeco.myeco.presentation.ui.fragment.InputDataFragment"
-        android:label="fragment_input_data"
-        tools:layout="@layout/fragment_input_data" />
+        tools:layout="@layout/fragment_main" />
 </navigation>

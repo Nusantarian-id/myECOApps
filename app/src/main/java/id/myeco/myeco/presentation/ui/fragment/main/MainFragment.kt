@@ -1,10 +1,11 @@
-package id.myeco.myeco.presentation.ui.fragment
+package id.myeco.myeco.presentation.ui.fragment.main
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import id.myeco.myeco.R
 import id.myeco.myeco.databinding.FragmentMainBinding
 
@@ -20,6 +21,11 @@ class MainFragment : Fragment() {
         // Inflate the layout for this fragment
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
     }
 
     override fun onDestroyView() {

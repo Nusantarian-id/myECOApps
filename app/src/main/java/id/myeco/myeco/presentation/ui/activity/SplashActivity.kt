@@ -15,14 +15,14 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-    }
-
-    override fun onResume() {
-        super.onResume()
 
         Handler(Looper.myLooper()!!).postDelayed({
             startActivity(Intent(this, MainActivity::class.java))
-            finishAffinity()
         }, 2000)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        finish()
     }
 }
