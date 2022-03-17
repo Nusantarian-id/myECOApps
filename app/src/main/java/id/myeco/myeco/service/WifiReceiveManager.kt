@@ -1,20 +1,23 @@
 package id.myeco.myeco.service
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
-import android.text.TextUtils
+import android.net.wifi.WifiNetworkSpecifier
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.OnLifecycleEvent
 
 class WifiReceiveManager(private val app: Application, lifecycle: Lifecycle) : LifecycleObserver {
 
@@ -24,8 +27,6 @@ class WifiReceiveManager(private val app: Application, lifecycle: Lifecycle) : L
     companion object {
         var disconnecting: Boolean = false
         var networkSSID: String = ""
-        var networkPassword: String = ""
-        var previousNetworkSSID: String = ""
         var networkId: Int = -1
     }
 
@@ -34,102 +35,106 @@ class WifiReceiveManager(private val app: Application, lifecycle: Lifecycle) : L
     // create intent filter for wifi connection receiver
     private val intentConnectionReceiver: IntentFilter
         get() {
-            val randomIntentFilter = IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION)
+            val randomIntentFilter = IntentFilter()
+            randomIntentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION)
             randomIntentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+            randomIntentFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
             return randomIntentFilter
         }
 
     private val wifiConnectionReceiver = object: BroadcastReceiver() {
         override fun onReceive(c: Context, intent: Intent) {
-            val action = intent.action
-            if (!TextUtils.isEmpty(action)){
-                when(action){
-                    WifiManager.WIFI_STATE_CHANGED_ACTION -> {
-                        val wifiInfo = wifiManager.connectionInfo
-                        var networkName = wifiInfo.ssid
-                        networkName =networkName.replace("\"", "")
-                        if (networkSSID == networkName && !disconnecting)
-                            wifiResponse.value = WifiResponse(WifiStatus.CONNECTED, null, null)
-                        else if (networkSSID != networkName && disconnecting)
-                            wifiResponse.value = WifiResponse(WifiStatus.DISCONNECTED, null, null)
+            when (intent.action) {
+                WifiManager.WIFI_STATE_CHANGED_ACTION -> {
+                    val wifiInfo = wifiManager.connectionInfo
+                    var networkName = wifiInfo.ssid
+                    networkName = networkName.replace("\"", "")
+                    if (networkSSID == networkName && !disconnecting)
+                        wifiResponse.value = WifiResponse.connected()
+                    else if (networkSSID != networkName && disconnecting)
+                        wifiResponse.value = WifiResponse.disconnected()
+                }
+                WifiManager.SCAN_RESULTS_AVAILABLE_ACTION -> {
+                    val sb = StringBuilder()
+                    val wifiList = wifiManager.scanResults
+                    val deviceList = arrayListOf<String>()
+                    for (scanResult in wifiList) {
+                        sb.append("\n").append(scanResult.SSID).append(" - ")
+                            .append(scanResult.capabilities)
+                        deviceList.add(scanResult.SSID.toString() + " - " + scanResult.capabilities)
                     }
                 }
             }
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    internal fun registerYourReceiver() {
-       app.registerReceiver(wifiConnectionReceiver, intentConnectionReceiver)
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    internal fun unRegisterYourReceiver() {
-        try {
-            app.unregisterReceiver(wifiConnectionReceiver)
-        } catch (e : IllegalArgumentException) {
-           Log.e("unregist receiver",e.message.toString())
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun getNetworkId(networkSSID: String): Int {
-        val list = wifiManager.configuredNetworks
-        for (i in list) {
-            if (i.SSID != null && i.SSID == "\"" + networkSSID + "\"") {
-                return i.networkId
+    private val lifecycleObserver = LifecycleEventObserver { source, event ->
+        when (event) {
+            Lifecycle.Event.ON_START -> {
+                app.registerReceiver(
+                    wifiConnectionReceiver,
+                    intentConnectionReceiver
+                )
+            }
+            Lifecycle.Event.ON_STOP -> {
+                try {
+                    app.unregisterReceiver(wifiConnectionReceiver)
+                } catch (e: IllegalArgumentException) {
+                    Log.e("unregist receiver", e.message.toString())
+                }
             }
         }
-        return -1
     }
 
-    fun connectWifi(ssid: String, password: String) {
+    fun connectWifi(ssid: String, pass: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            try {
+                Log.d("Connect Pre-Q", "Pre Q Connection")
+                val wifiConfig = WifiConfiguration()
+                wifiConfig.SSID = "\"" + ssid + "\""
+                wifiConfig.preSharedKey = "\"" + pass + "\""
+                val netId = wifiManager.addNetwork(wifiConfig)
+                wifiManager.disconnect()
+                wifiManager.enableNetwork(netId, true)
+                wifiManager.reconnect()
+            } catch (e: Exception) {
+                Log.e("Connect Pre-Q", e.toString())
+            }
+        } else {
+            Log.e("Connect Q", "Q Connection")
+            val specifier = WifiNetworkSpecifier.Builder()
+                .setSsid(ssid)
+                .setWpa2Passphrase(pass)
+                .build()
 
-        if (TextUtils.isEmpty(ssid) || TextUtils.isEmpty(password)) {
-            Log.d("onReceive","onReceive: cannot use connection without passing in a proper wifi SSID and password.")
-            return
+            val networkRequest = NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .setNetworkSpecifier(specifier)
+                .build()
+
+            val manager = app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+            val networkCallback = object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    super.onAvailable(network)
+                    if (ssid.contains("Test-V4-2"))
+                        manager.bindProcessToNetwork(network)
+                }
+
+                override fun onLost(network: Network) {
+                    super.onLost(network)
+                    // This is to stop the looping request for OnePlus & Xiaomi models
+                    manager.bindProcessToNetwork(null)
+                }
+            }
+            manager.requestNetwork(networkRequest, networkCallback)
         }
-
-        networkSSID = ssid
-        networkPassword = password
-
-        wifiResponse.value = WifiResponse(WifiStatus.CONNECTING, null, null)
-        if (!wifiManager.isWifiEnabled) {
-            wifiManager.isWifiEnabled = true
-        }
-
-        val wifiInfo = wifiManager.connectionInfo
-        if(wifiInfo.ssid == networkSSID) {
-            wifiResponse.value = WifiResponse(WifiStatus.CONNECTED, null, null)
-            return
-        }
-        previousNetworkSSID = wifiInfo.ssid
-        disconnecting = false
-        connectToWifi()
-    }
-
-    private fun connectToWifi() {
-        Log.d("connect to wifi","WiFi connectToWifi")
-        val conf = WifiConfiguration()
-        conf.SSID = String.format("\"%s\"", networkSSID);
-        conf.preSharedKey = String.format("\"%s\"", networkPassword);
-        conf.status = WifiConfiguration.Status.ENABLED;
-        conf.hiddenSSID = true;
-
-        networkId = wifiManager.addNetwork(conf)
-        if(networkId == -1) {
-            networkId = getNetworkId(networkSSID)
-        }
-
-        wifiManager.disconnect()
-        wifiManager.enableNetwork(networkId, true)
-        wifiManager.reconnect()
     }
 
     fun disconnectFromWifi() {
-        Log.d("disconnect from wifi","WiFi disconnectFromWifi")
+        Log.d("disconnect from wifi", "WiFi disconnectFromWifi")
         disconnecting = true
-        wifiResponse.value = WifiResponse(WifiStatus.DISCONNECTING, null, null)
+        wifiResponse.value = WifiResponse.disconnecting()
         wifiManager.disconnect()
         wifiManager.disableNetwork(networkId)
         wifiManager.removeNetwork(networkId)
@@ -137,6 +142,6 @@ class WifiReceiveManager(private val app: Application, lifecycle: Lifecycle) : L
     }
 
     init {
-        lifecycle.addObserver(this)
+        lifecycle.addObserver(lifecycleObserver)
     }
 }

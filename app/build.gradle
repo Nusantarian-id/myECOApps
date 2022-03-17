@@ -9,10 +9,11 @@ android {
 
     defaultConfig {
         applicationId "id.myeco.myeco"
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 32
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,10 +53,14 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation "com.squareup.retrofit2:converter-scalars:2.9.0"
     implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.5"
 
     //coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0-native-mt'
+
+    //jwt decoder
+    implementation 'com.auth0.android:jwtdecode:2.0.1'
 
     // Koin
     implementation "io.insert-koin:koin-core:2.2.3"
@@ -67,6 +72,12 @@ dependencies {
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:2.4.1"
+
+    //google play
+    implementation "com.google.android.gms:play-services-location:19.0.1"
+
+    //multidex
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     //test unit
     testImplementation 'junit:junit:4.13.2'

@@ -1,5 +1,5 @@
 package id.myeco.myeco.core.source.remote.response
 
-data class PostDataResponse(
+data class GetDataResponse(
     val token: String
 )

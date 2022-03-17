@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.ui.fragment.main.MainFragment">
+    tools:context=".presentation.ui.fragment.main.ConnectionFragment">
 
     <TextView
         android:id="@+id/tv_clue"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
-        android:text="Hubungkan aplikasi ke wifi alat, pastikan wifi berbeda dengan wifi rumah"
+        android:text="Hubungkan aplikasi ke wifi rumah"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:hint="SSID Wifi"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_clue"
@@ -33,9 +33,11 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_wifi"
-            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:cursorVisible="false"
+            android:focusable="false"
             android:layout_width="match_parent"
-            android:inputType="none" />
+            android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -48,15 +50,15 @@
         android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/til_wifi"
         app:passwordToggleEnabled="true"
+        app:layout_constraintTop_toBottomOf="@id/til_wifi"
         app:startIconDrawable="@drawable/ic_lock">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_pass"
-            android:layout_height="wrap_content"
+            android:inputType="textPassword"
             android:layout_width="match_parent"
-            android:inputType="none" />
+            android:layout_height="wrap_content" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -74,27 +76,17 @@
         app:layout_constraintTop_toBottomOf="@id/til_pass" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_submit"
+        android:id="@+id/btn_next"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
         android:layout_marginTop="20dp"
-        android:enabled="false"
         android:padding="12dp"
-        android:text="Submit"
+        android:text="Next"
         app:cornerRadius="10dp"
+        android:enabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_connect" />
-
-    <ProgressBar
-        android:id="@+id/progress"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

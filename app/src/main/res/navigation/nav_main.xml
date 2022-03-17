@@ -3,7 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main"
-    app:startDestination="@id/mainFragment">
+    app:startDestination="@id/connectionFragment">
+    <fragment
+        android:id="@+id/connectionFragment"
+        android:name="id.myeco.myeco.presentation.ui.fragment.main.ConnectionFragment"
+        android:label="ConnectionFragment" >
+        <action
+            android:id="@+id/action_connectionFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
     <fragment
         android:id="@+id/mainFragment"
         android:name="id.myeco.myeco.presentation.ui.fragment.main.MainFragment"

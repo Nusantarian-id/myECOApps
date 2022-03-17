@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:id="@+id/nav_main"
+    android:layout_height="match_parent"
+    android:id="@+id/nav_landing"
     android:name="androidx.navigation.fragment.NavHostFragment"
     app:defaultNavHost="true"
-    app:navGraph="@navigation/nav_main"
-    android:layout_height="match_parent"
-    tools:context=".presentation.ui.activity.MainActivity"/>
+    app:navGraph="@navigation/nav_landing"
+    tools:context=".presentation.ui.activity.LandingActivity"/>

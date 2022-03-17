@@ -1,6 +1,7 @@
 package id.myeco.myeco
 
 import android.app.Application
+import id.myeco.myeco.di.localModule
 import id.myeco.myeco.di.networkModule
 import id.myeco.myeco.di.repoModule
 import id.myeco.myeco.di.viewModelModule
@@ -16,6 +17,7 @@ class App : Application() {
             androidLogger(Level.NONE)
             androidContext(this@App)
             modules(
+                localModule,
                 networkModule,
                 repoModule,
                 viewModelModule
