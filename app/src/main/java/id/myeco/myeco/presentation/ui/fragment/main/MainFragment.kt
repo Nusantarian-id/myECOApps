@@ -69,9 +69,6 @@ class MainFragment : Fragment() {
 
     private fun sendData(ssid: String, pass: String, userId: String) {
         viewModel.getData(ssid, pass, userId).observe(viewLifecycleOwner) {
-            val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            val wifiLock = wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "wifiLock")
-            if (!wifiLock.isHeld) wifiLock.acquire()
             binding.progress.visibility = View.GONE
             startActivity(Intent(requireContext(), WebviewActivity::class.java))
         }
