@@ -1,5 +1,6 @@
 package id.myeco.myeco.core.repository
 
+import android.util.Log
 import id.myeco.myeco.core.source.Resource
 import id.myeco.myeco.core.source.remote.network.EspApiService
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -21,6 +22,7 @@ class EspDataRepo(private val apiService: EspApiService): EspDataDataSource {
                 result.onNext(Resource.Success("Success", it))
             }, {
                 result.onNext(Resource.Error(it.message.toString()))
+                Log.e("Error apa nih", it.message.toString())
             })
         return result.toFlowable(BackpressureStrategy.BUFFER)
     }

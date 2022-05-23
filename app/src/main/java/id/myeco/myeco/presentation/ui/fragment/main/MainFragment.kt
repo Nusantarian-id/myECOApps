@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,6 +48,7 @@ class MainFragment : Fragment() {
             val ssid = pref.getString("ssid", "")
             val pass = pref.getString("pass", "")
             val userId = pref.getString("data", "")
+            Log.e("Trying", "${ssid} and ${pass} and ${userId}")
             sendData(ssid!!, pass!!, userId!!)
         }
         checkWifiConnection()
@@ -68,10 +70,12 @@ class MainFragment : Fragment() {
     }
 
     private fun sendData(ssid: String, pass: String, userId: String) {
-        viewModel.getData(ssid, pass, userId).observe(viewLifecycleOwner) {
-            binding.progress.visibility = View.GONE
-            startActivity(Intent(requireContext(), WebviewActivity::class.java))
-        }
+        binding.progress.visibility = View.GONE
+        startActivity(Intent(requireContext(), WebviewActivity::class.java))
+//        viewModel.getData(ssid, pass, userId).observe(viewLifecycleOwner) {
+//            binding.progress.visibility = View.GONE
+//            startActivity(Intent(requireContext(), WebviewActivity::class.java))
+//        }
     }
 
     private val watcher: TextWatcher = object : TextWatcher {

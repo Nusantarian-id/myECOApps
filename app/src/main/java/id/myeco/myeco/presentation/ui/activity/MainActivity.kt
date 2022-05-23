@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
@@ -15,7 +14,6 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import id.myeco.myeco.databinding.ActivityMainBinding
-import id.myeco.myeco.utils.toastLong
 import id.myeco.myeco.utils.toastShort
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
-        private const val MY_PERMISSIONS_REQUEST_BACKGROUND_LOCATION = 66
     }
 
     private val locationCallback: LocationCallback = object : LocationCallback() {
@@ -102,18 +99,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 requestLocationPermission()
             }
-        } else {
-            checkBackgroundLocation()
-        }
-    }
-
-    private fun checkBackgroundLocation() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestBackgroundLocationPermission()
         }
     }
 
@@ -125,24 +110,6 @@ class MainActivity : AppCompatActivity() {
             ),
             MY_PERMISSIONS_REQUEST_LOCATION
         )
-    }
-
-    private fun requestBackgroundLocationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ),
-                MY_PERMISSIONS_REQUEST_BACKGROUND_LOCATION
-            )
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                MY_PERMISSIONS_REQUEST_LOCATION
-            )
-        }
     }
 
     override fun onRequestPermissionsResult(
@@ -164,7 +131,6 @@ class MainActivity : AppCompatActivity() {
                             locationCallback,
                             Looper.getMainLooper()
                         )
-                        checkBackgroundLocation()
                     }
                 } else {
                     applicationContext?.toastShort("permission denied")
@@ -180,25 +146,6 @@ class MainActivity : AppCompatActivity() {
                             ),
                         )
                     }
-                }
-                return
-            }
-            MY_PERMISSIONS_REQUEST_BACKGROUND_LOCATION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    if (ContextCompat.checkSelfPermission(
-                            this,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        fusedLocationProvider?.requestLocationUpdates(
-                            locationRequest,
-                            locationCallback,
-                            Looper.getMainLooper()
-                        )
-                        applicationContext?.toastLong("Granted Background Location Permission")
-                    }
-                } else {
-                    applicationContext?.toastShort("permission denied")
                 }
                 return
             }

@@ -8,15 +8,13 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import id.myeco.myeco.R
 import id.myeco.myeco.databinding.FragmentConnectionBinding
 import id.myeco.myeco.utils.removeQuotation
-import id.myeco.myeco.utils.toastShort
 
 class ConnectionFragment : Fragment() {
 
@@ -42,7 +40,7 @@ class ConnectionFragment : Fragment() {
         }
         binding.btnNext.setOnClickListener {
             // save data
-            val pref = requireContext().applicationContext.getSharedPreferences("MyEco", 0)
+            val pref = requireContext().applicationContext.getSharedPreferences("myEco", 0)
             val editor = pref.edit()
             editor.putString("ssid", binding.tilWifi.editText?.text.toString().removeQuotation())
             editor.putString("pass", binding.tilPass.editText?.text.toString().removeQuotation())
