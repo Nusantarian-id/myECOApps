@@ -6,7 +6,7 @@ plugins {
 
 ext.versionMajor = 1
 ext.versionMinor = 0
-ext.versionPatch = 2
+ext.versionPatch = 3
 ext.versionClassifier = null
 ext.isRc = true
 ext.minimumSdkVersion = 19
